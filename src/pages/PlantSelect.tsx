@@ -14,6 +14,7 @@ import colors from '../styles/colors';
 import fonts from '../styles/fonts';
 import api from '../services/api';
 import { PlantCardPrimary } from '../components/PlantCardPrimary';
+import { useNavigation } from '@react-navigation/core';
 
 interface EnviromentProps {
     key: string;
@@ -43,8 +44,8 @@ export function PlantSelect() {
     
     const[page, setPage] = useState(1);
     const[loadingMore, setLoadingMore] = useState(false);
-    const[loadedAll, setLoadedAll] = useState(false);
      
+    const navigation = useNavigation();
 
     function handleEnviromentSelected(environment: string){
         setEnviromentSelected(environment);
@@ -87,6 +88,10 @@ export function PlantSelect() {
         fetchPlants();
     }   
 
+    function handlePlantSelect(plant: PlantProps) {
+        navigation.navigate('PlantSave', { plant });
+    }
+
     useEffect(() => {
         async function fetchEnviroment() {
             const { data } = await api
@@ -124,6 +129,7 @@ export function PlantSelect() {
             <View>
                 <FlatList
                     data={enviroment}
+                    keyExtractor={(item) =>String(item.key)}
                     renderItem={({ item }) => (
                         <EnviromentButton 
                             title={item.title} 
@@ -140,8 +146,12 @@ export function PlantSelect() {
             <View style={styles.plants}>
                 <FlatList 
                     data={filteredPlants}
+                    keyExtractor={(item) =>String(item.id)}
                     renderItem={({ item }) => (
-                        <PlantCardPrimary data={item} />
+                        <PlantCardPrimary 
+                                data={item} 
+                                onPress={() => handlePlantSelect(item)}    
+                                />
                     )}
                     showsVerticalScrollIndicator={false}
                     numColumns={2}
